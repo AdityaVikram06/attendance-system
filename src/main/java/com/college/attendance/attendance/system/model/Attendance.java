@@ -77,4 +77,9 @@ public class Attendance {
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
+    @Transient
+    public boolean isPresent() {
+        return "PRESENT".equalsIgnoreCase(this.status);
+    }
+
 }

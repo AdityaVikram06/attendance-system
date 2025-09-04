@@ -13,22 +13,36 @@ public class Subject {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String facultyName;
+    // Many subjects can belong to one faculty
+    @ManyToOne
+    @JoinColumn(name = "faculty_id", nullable = false)
+    private Faculty faculty;
 
     public Subject() {}
 
-    public Subject(String name, String facultyName) {
+    public Subject(String name, Faculty faculty) {
         this.name = name;
-        this.facultyName = facultyName;
+        this.faculty = faculty;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String getFacultyName() { return facultyName; }
-    public void setFacultyName(String facultyName) { this.facultyName = facultyName; }
+    public Faculty getFaculty() {
+        return faculty;
+    }
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
+    }
 }

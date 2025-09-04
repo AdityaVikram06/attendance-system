@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/faculty")
+@RequestMapping("/faculties")
 public class FacultyController {
 
     @Autowired
     private FacultyRepository facultyRepository;
 
-    // Get all faculty
+    // Get all faculties
     @GetMapping
-    public List<Faculty> getAllFaculty() {
+    public List<Faculty> getAllFaculties() {
         return facultyRepository.findAll();
     }
 
@@ -26,10 +26,29 @@ public class FacultyController {
         return facultyRepository.save(faculty);
     }
 
-    // Get single faculty by id
+    // Get faculty by id
     @GetMapping("/{id}")
     public Faculty getFacultyById(@PathVariable Long id) {
         return facultyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Faculty not found"));
+    }
+
+    // Update faculty
+    @PutMapping("/{id}")
+    public Faculty updateFaculty(@PathVariable Long id, @RequestBody Faculty updatedFaculty) {
+        Faculty faculty = facultyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Faculty not found"));
+
+        faculty.setName(updatedFaculty.getName());
+        faculty.setEmail(updatedFaculty.getEmail());
+
+        return facultyRepository.save(faculty);
+    }
+
+    // Delete faculty
+    @DeleteMapping("/{id}")
+    public String deleteFaculty(@PathVariable Long id) {
+        facultyRepository.deleteById(id);
+        return "Faculty with ID " + id + " deleted successfully!";
     }
 }

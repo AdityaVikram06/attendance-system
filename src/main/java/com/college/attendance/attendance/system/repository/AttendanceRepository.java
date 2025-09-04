@@ -8,15 +8,21 @@ import java.util.List;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
-    // find by student (nested property)
+
     List<Attendance> findByStudent_Id(Long studentId);
 
-    // find by class session (nested property)
     List<Attendance> findByClassSession_Id(Long classId);
 
-    // count present in a class
     long countByClassSession_IdAndStatus(Long classId, String status);
 
-    // count all by class
     long countByClassSession_Id(Long classId);
+
+    // --- subject-level queries ---
+    List<Attendance> findByClassSession_Subject_Id(Long subjectId);
+
+    List<Attendance> findByClassSession_Subject_IdAndStudent_Id(Long subjectId, Long studentId);
+
+    long countByClassSession_Subject_Id(Long subjectId);
+
+    long countByClassSession_Subject_IdAndStatus(Long subjectId, String status);
 }
