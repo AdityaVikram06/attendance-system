@@ -3,6 +3,7 @@ package com.college.attendance.attendance.system.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+
 @Entity
 @Table(name = "attendance")
 public class Attendance {
@@ -82,4 +83,6 @@ public class Attendance {
         return "PRESENT".equalsIgnoreCase(this.status);
     }
 
+    public void setPresent(boolean b) {
+    }
 }

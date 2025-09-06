@@ -20,7 +20,13 @@ public class ClassSession {
     @Column(nullable = false)
     private LocalDateTime endTime;
 
-    // Link to Subject
+    @Column
+    private LocalDateTime qrExpiryTime;
+
+    @Column(unique = true)
+    private String manualCode; // <-- add this
+
+    // 🔗 Many sessions ↔ One subject
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
@@ -34,6 +40,7 @@ public class ClassSession {
         this.subject = subject;
     }
 
+    // Getters & setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -45,6 +52,12 @@ public class ClassSession {
 
     public LocalDateTime getEndTime() { return endTime; }
     public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
+
+    public LocalDateTime getQrExpiryTime() { return qrExpiryTime; }
+    public void setQrExpiryTime(LocalDateTime qrExpiryTime) { this.qrExpiryTime = qrExpiryTime; }
+
+    public String getManualCode() { return manualCode; }   // <-- getter
+    public void setManualCode(String manualCode) { this.manualCode = manualCode; } // <-- setter
 
     public Subject getSubject() { return subject; }
     public void setSubject(Subject subject) { this.subject = subject; }

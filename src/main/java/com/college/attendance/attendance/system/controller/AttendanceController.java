@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/attendance")
@@ -25,13 +27,13 @@ public class AttendanceController {
     @Autowired
     private ClassSessionRepository classSessionRepository;
 
+    // ✅ Get all attendance records
     @GetMapping
     public List<Attendance> getAllAttendance() {
         return attendanceRepository.findAll();
     }
 
-
-
+    // ✅ Mark attendance (base method)
     @PostMapping
     public Attendance markAttendance(@RequestParam Long studentId,
                                      @RequestParam Long classId,
@@ -50,5 +52,37 @@ public class AttendanceController {
         );
 
         return attendanceRepository.save(attendance);
+    }
+
+    // ✅ Alias (frontend calls /attendance/mark)
+    @PostMapping("/mark")
+    public Attendance markAttendanceAlias(@RequestParam Long studentId,
+                                          @RequestParam Long classId,
+                                          @RequestParam(defaultValue = "PRESENT") String status) {
+        return markAttendance(studentId, classId, status);
+    }
+
+    // ✅ Generate QR (faculty side)
+    @PostMapping("/generate-qr")
+    public Map<String, Object> generateQr(@RequestParam Long classId) {
+        ClassSession classSession = classSessionRepository.findById(classId)
+                .orElseThrow(() -> new RuntimeException("Class not found"));
+
+        String token = "QR-" + classId + "-" + System.currentTimeMillis();
+        classSession.setQrExpiryTime(LocalDateTime.now().plusMinutes(5));
+        classSessionRepository.save(classSession);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("qrToken", token);
+        response.put("expiry", classSession.getQrExpiryTime());
+        return response;
+    }
+
+    // ✅ Validate QR
+    @PostMapping("/validate-qr")
+    public Map<String, Object> validateQr(@RequestParam String qrToken) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("valid", qrToken.startsWith("QR-"));
+        return response;
     }
 }

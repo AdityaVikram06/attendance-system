@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
-
+    Attendance findByStudentIdAndClassSessionId(Long studentId, Long classSessionId);
     List<Attendance> findByStudent_Id(Long studentId);
 
     List<Attendance> findByClassSession_Id(Long classId);

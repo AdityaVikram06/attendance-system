@@ -1,6 +1,8 @@
 package com.college.attendance.attendance.system.model;
 
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "students")
@@ -13,53 +15,37 @@ public class Student {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    private String email;
+    private boolean present;
     private String rollNumber;
 
-    @Column(nullable = false)
-    private String department;
+    // 🔗 Many students ↔ Many subjects
+    @ManyToMany
+    @JoinTable(
+            name = "student_subjects",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "subject_id")
+    )
+    private Set<Subject> subjects = new HashSet<>();
 
+    public Student() {}
 
-    // Getters and Setters
-    @Column(nullable = false)
-    private boolean present;
+    // Getters & setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public boolean isPresent() {
-        return present;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setPresent(boolean present) {
-        this.present = present;
-    }
-    public Long getId() {
-        return id;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getRollNumber() { return rollNumber; }
+    public void setRollNumber(String rollNumber) { this.rollNumber = rollNumber; }
 
-    public String getName() {
-        return name;
-    }
+    public boolean isPresent() { return present; }
+    public void setPresent(boolean present) { this.present = present; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getRollNumber() {
-        return rollNumber;
-    }
-
-    public void setRollNumber(String rollNumber) {
-        this.rollNumber = rollNumber;
-    }
-
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
-    }
+    public Set<Subject> getSubjects() { return subjects; }
+    public void setSubjects(Set<Subject> subjects) { this.subjects = subjects; }
 }

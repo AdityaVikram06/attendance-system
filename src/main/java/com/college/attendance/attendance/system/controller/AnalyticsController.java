@@ -9,6 +9,8 @@ import com.college.attendance.attendance.system.repository.ClassSessionRepositor
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -227,6 +229,73 @@ public class AnalyticsController {
 
         return overviewList;
     }
+    // --- 9. Student: Classes Attended Count ---
+    @GetMapping("/student/{studentId}/classes-attended")
+    public Map<String, Object> getClassesAttended(@PathVariable Long studentId) {
+        List<Attendance> records = attendanceRepository.findByStudent_Id(studentId);
+        long attended = records.stream().filter(a -> "PRESENT".equalsIgnoreCase(a.getStatus())).count();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("studentId", studentId);
+        result.put("classesAttended", attended);
+        result.put("totalClasses", records.size());
+        return result;
+    }
+
+    // --- 10. Student: Classes Today ---
+    @GetMapping("/student/{studentId}/classes-today")
+    public List<ClassSession> getClassesToday(@PathVariable Long studentId) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(23, 59, 59);
+
+        // Fetch student’s subjects
+        List<Subject> subjects = subjectRepository.findByStudents_Id(studentId);
+
+        // Find all classes for those subjects today
+        List<ClassSession> sessions = new ArrayList<>();
+        for (Subject sub : subjects) {
+            List<ClassSession> classList = classSessionRepository.findBySubject_Id(sub.getId());
+            for (ClassSession cs : classList) {
+                if (cs.getStartTime().isAfter(startOfDay) && cs.getStartTime().isBefore(endOfDay)) {
+                    sessions.add(cs);
+                }
+            }
+        }
+        return sessions;
+    }
+
+    // --- 11. Student: Active Classes Right Now ---
+    @GetMapping("/student/{studentId}/active-classes")
+    public List<ClassSession> getActiveClasses(@PathVariable Long studentId) {
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Subject> subjects = subjectRepository.findByStudents_Id(studentId);
+
+        List<ClassSession> sessions = new ArrayList<>();
+        for (Subject sub : subjects) {
+            List<ClassSession> classList = classSessionRepository.findBySubject_Id(sub.getId());
+            for (ClassSession cs : classList) {
+                if (!cs.getStartTime().isAfter(now) && !cs.getEndTime().isBefore(now)) {
+                    sessions.add(cs);
+                }
+            }
+        }
+        return sessions;
+    }
+
+
+    // --- 12. Student: Recent Attendance (last N records) ---
+    @GetMapping("/student/{studentId}/recent-attendance")
+    public List<Attendance> getRecentAttendance(
+            @PathVariable Long studentId,
+            @RequestParam(defaultValue = "5") int limit) {
+        List<Attendance> records = attendanceRepository.findByStudent_Id(studentId);
+                records.sort(Comparator.comparing(a -> a.getClassSession().getStartTime(), Comparator.reverseOrder()));
+
+                return records.stream().limit(limit).toList();
+    }
+
 
 
 }
